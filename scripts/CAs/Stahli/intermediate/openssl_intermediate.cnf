@@ -1,0 +1,83 @@
+[ ca ]
+default_ca = CA_default
+
+[ CA_default ]
+dir               = /Users/matthiasstahli/Projects/httpsdemo/scripts/CAs/Stahli/intermediate
+certs             = $dir/certs
+crl_dir           = $dir/crl
+new_certs_dir     = $dir/certs
+database          = $dir/index.txt
+serial            = $dir/serial
+RANDFILE          = $dir/private/.rand
+
+private_key       = $dir/private/int.key.pem
+certificate       = $dir/certs/int.crt.pem
+
+unique_subject    = no # Allow creation of several certs with the same subject.
+copy_extensions   = copy
+
+# For certificate revocation lists.
+crlnumber         = $dir/crlnumber
+crl               = $dir/crl/int.crl.pem
+crl_extensions    = crl_ext
+default_crl_days  = 1800
+
+default_md        = sha384
+
+name_opt          = ca_default
+cert_opt          = ca_default
+default_days      = 3000
+preserve          = no
+policy            = policy_loose
+
+[ policy_loose ]
+# Allow the intermediate CA to sign a more diverse range of certificates. Can be checked by root.
+countryName             = optional
+stateOrProvinceName     = optional
+localityName            = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ req ]
+default_bits        = 2048
+distinguished_name  = req_distinguished_name
+string_mask         = utf8only
+default_md          = sha256
+
+[ req_distinguished_name ]
+countryName                     = Country Name (2 letter code)
+stateOrProvinceName             = State or Province Name
+localityName                    = Locality Name
+0.organizationName              = Organization Name
+organizationalUnitName          = Organizational Unit Name
+commonName                      = Common Name
+emailAddress                    = Email Address
+
+[ crl_ext ]
+authorityKeyIdentifier=keyid:always
+
+[ ocsp ]
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+keyUsage = critical, digitalSignature, keyEncipherment
+extendedKeyUsage = critical, OCSPSigning
+
+[ crl_info ]
+URI.0 = http://Stahli/intermediate/crl
+
+[ ocsp_info ]
+caIssuers;URI.0 = http://Stahli/intermediate/certificate
+OCSP;URI.0 = http://Stahli/intermediate/ocsp
+
+[ server_cert ]
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always
+keyUsage = critical, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+crlDistributionPoints = @crl_info
+authorityInfoAccess = @ocsp_info
+
