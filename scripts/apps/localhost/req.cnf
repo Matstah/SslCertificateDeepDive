@@ -1,0 +1,26 @@
+[ req ]
+distinguished_name = req_distinguished_name
+req_extensions      = extensions
+
+[ req_distinguished_name ]
+commonName          = Common Name
+commonName_default  = localhost
+countryName         = Country Name (2 letter code)
+countryName_default = CH
+countryName_min     = 2
+countryName_max     = 2
+stateOrProvinceName         = State or Province
+stateOrProvinceName_default = Switzerland
+localityName                  = Locality Name (eg, city)
+localityName_default          = Zurich
+organizationName         = Organization Name
+organizationName_default = Example Org
+organizationalUnitName          = Organizational Unit Name (eg, section)
+organizationalUnitName_default  = deepdive
+
+[ extensions ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.0 = localhost
+#DNS.1 = Whatever else here

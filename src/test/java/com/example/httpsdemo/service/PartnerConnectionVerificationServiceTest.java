@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;
 import java.security.SecureRandom;
+import java.security.cert.Certificate;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -29,17 +30,18 @@ public class PartnerConnectionVerificationServiceTest {
 
     @BeforeEach
     void beforeEach() throws Exception {
-        trustManagerFactory = TrustManagerFactory.getInstance("PKIX");
-        trustManagerFactory.init(loadKeyStore("truststore.p12"));
-
-        clientKeyManagerFactory = KeyManagerFactory.getInstance("PKIX");
-        clientKeyManagerFactory.init(loadKeyStore("client-keystore.p12"), "password".toCharArray());
-
-        trustManagerFactory = TrustManagerFactory.getInstance("PKIX");
-        trustManagerFactory.init(loadKeyStore("truststore.p12"));
 
         localhostKeyManagerFactory = KeyManagerFactory.getInstance("PKIX");
         localhostKeyManagerFactory.init(loadKeyStore("localhost-keystore.p12"), "password".toCharArray());
+
+        trustManagerFactory = TrustManagerFactory.getInstance("PKIX");
+        trustManagerFactory.init(loadKeyStore("localhost-keystore.p12"));
+
+        clientKeyManagerFactory = KeyManagerFactory.getInstance("PKIX");
+        clientKeyManagerFactory.init(loadKeyStore("client-keystore.p12"), "password".toCharArray());
+ 
+        trustManagerFactory = TrustManagerFactory.getInstance("PKIX");
+        trustManagerFactory.init(loadKeyStore("truststore.p12"));
 
         untrustedLocalhostKeyManagerFactory = KeyManagerFactory.getInstance("PKIX");
         untrustedLocalhostKeyManagerFactory.init(loadKeyStore("untrusted-localhost-keystore.p12"),
@@ -56,6 +58,8 @@ public class PartnerConnectionVerificationServiceTest {
         try {
             KeyStore keyStore = KeyStore.getInstance("pkcs12");
             keyStore.load(getClass().getResourceAsStream(resourceName), "password".toCharArray());
+            Certificate[] certificates = keyStore.getCertificateChain("localhost");
+            
             return keyStore;
         } catch (Exception e) {
             throw new RuntimeException(e);

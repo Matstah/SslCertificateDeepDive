@@ -142,7 +142,7 @@ chmod 400 private/ca.key.pem
 # C=CH/ST=Switzerland/L=Zurich
 openssl req -config openssl_root.cnf -new -x509 -sha384 -extensions v3_ca \
   -key private/ca.key.pem -passin pass:password -out certs/ca.crt.pem \
-  -subj "/CN=$ca_name Root CA/C=CH/ST=Switzerland/L=Zurich/O=Intapp Team/OU=pki" \
+  -subj "/CN=$ca_name Root CA/C=CH/ST=Switzerland/L=Zurich/O=My Team/OU=pki" \
   -days 10000
 
 # print the certificate
@@ -176,7 +176,7 @@ openssl req \
   -keyout private/ocsp-root.key.pem \
   -passout pass:password \
   -out csr/ocsp-root.csr.pem \
-  -subj "/CN=$ca_name OCSP for root/C=CH/ST=Switzerland/L=Zurich/O=Intapp Team/OU=pki" 
+  -subj "/CN=$ca_name OCSP for root/C=CH/ST=Switzerland/L=Zurich/O=My Team/OU=pki" 
 openssl ca -batch \
   -config openssl_root.cnf \
   -extensions ocsp \
@@ -297,7 +297,7 @@ openssl req -new \
   -keyout intermediate/private/int.key.pem \
   -passout pass:password \
   -out intermediate/csr/int.csr \
-  -subj "/CN=$ca_name Intermediate CA/C=CH/ST=Switzerland/L=Zurich/O=Intapp Team/OU=pki"
+  -subj "/CN=$ca_name Intermediate CA/C=CH/ST=Switzerland/L=Zurich/O=My Team/OU=pki"
 
 openssl ca -batch -config root/openssl_root.cnf -extensions v3_intermediate_ca -days 10000 \
   -md sha384 -in intermediate/csr/int.csr -out intermediate/certs/int.crt.pem \
@@ -333,7 +333,7 @@ openssl req \
   -keyout intermediate/private/ocsp-int.key.pem \
   -passout pass:password \
   -out intermediate/csr/ocsp-int.csr.pem \
-  -subj "/CN=$ca_name OCSP for int/C=CH/ST=Switzerland/L=Zurich/O=Intapp Team/OU=pki"
+  -subj "/CN=$ca_name OCSP for int/C=CH/ST=Switzerland/L=Zurich/O=My Team/OU=pki"
 
 openssl ca -batch \
   -config intermediate/openssl_intermediate.cnf \

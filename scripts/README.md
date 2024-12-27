@@ -290,12 +290,13 @@ openssl verify -CAfile root/certs/ca.crt.pem intermediate/certs/int.crt.pem
 ```
 
 Note: To verify your entire chain in one command:
+
 ```
 openssl verify -CAfile RootCert.pem -untrusted Intermediate.pem UserCert.pem
 ```
 
-
 ### 4. Create the certificate chain file
+
 To create the CA certificate chain, concatenate the intermediate and root certificates together. We will use this file later to verify certificates signed by the intermediate CA.
 
 ```
@@ -307,11 +308,38 @@ chmod 444 intermediate/certs/chain.crt.pem
 Note: Our certificate chain file must include the root certificate because no client application knows about it yet. A better option, particularly if you’re administrating an intranet, is to install your root certificate on every client that needs to connect. In that case, the chain file need only contain your intermediate certificate.
 
 ## Sign server and client certificates
-### 1. Create a key
-Our root and intermediate pairs are 4096 bits. Server and client certificates normally expire after one year, so we can safely use 2048 bits instead.
 
+It is quite similar to the intermediate case. We create a Certificate Signature Request for our domain, send it to our CA and let it be signed. The domain owner keeps the private key.
 
+Run `server-cert.sh` and tell it to use the created CA.
+It will generate a Keystore file containing the full chain.
 
+But what and how is put into our Java application?
+
+It seems that each certificate also contains a fingerpring. Fingerprints are merely hash representations of certificates and cannot participate in cryptographic operations like signing, encryption, or verification. The fingerprint is basically a hash containing all certificate information and the signature (so also public key). It is an easy and fast way to check if things match, because if the fingerprint match, everything else must also match. But how is the rest done?
+
+Why can our demo work with only the fingerprints instead of the certificate.
+
+Seems like client contains private key, localhost and truststores fingerprints.
+
+Things to Ensure:
+
+- Truststore Contains Root CA:
+  The root certificate (Certificate[3]) must be in the truststore (truststore.p12) of the client.
+- Password Protection: The keystore should have a strong password.
+- Hostname Verification: The client must verify CN=localhost or SAN localhost to avoid certificate mismatch errors.
+
+---> -v makes a big difference! The -v flag in the keytool -list command stands for "verbose." It provides a detailed, expanded output about the contents of the keystore.
+
+```
+keytool -list -keystore localhost-keystore.p12 -storepass password
+```
+
+vs.
+
+```
+keytool -list -v -keystore localhost-keystore.p12 -storepass password
+```
 
 # learnings & definitions
 

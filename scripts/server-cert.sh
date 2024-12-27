@@ -56,17 +56,17 @@ req_extensions      = extensions
 commonName          = Common Name
 commonName_default  = $appname
 countryName         = Country Name (2 letter code)
-countryName_default = SK
+countryName_default = CH
 countryName_min     = 2
 countryName_max     = 2
 stateOrProvinceName         = State or Province
-stateOrProvinceName_default = Slovakia
+stateOrProvinceName_default = Switzerland
 localityName                  = Locality Name (eg, city)
-localityName_default          = Bratislava
+localityName_default          = Zurich
 organizationName         = Organization Name
 organizationName_default = Example Org
 organizationalUnitName          = Organizational Unit Name (eg, section)
-organizationalUnitName_default  = techtalk
+organizationalUnitName_default  = deepdive
 
 [ extensions ]
 subjectAltName = @alt_names
@@ -87,7 +87,7 @@ openssl req \
 openssl ca -batch \
   -config $CURRENT_CA_PATH/intermediate/openssl_intermediate.cnf \
   -extensions server_cert \
-  -days 10000 \
+  -days 3650 \
   -notext \
   -md sha384 \
   -in $appname.csr.pem \
@@ -95,3 +95,16 @@ openssl ca -batch \
   -passin pass:password
 
 cat "$appname.crt.pem" "$CURRENT_CA_PATH/intermediate/certs/chain.crt.pem" > "$appname.chain.crt.pem"
+
+openssl pkcs12 -export \
+  -inkey "$appname.key.pem" \
+  -in "$appname.chain.crt.pem" \
+  -out "$appname-keystore.p12" \
+  -passout pass:password
+
+
+echo
+echo "Content of created keystore.p12:"
+echo
+
+keytool -list -v -keystore "$appname-keystore.p12" -storetype PKCS12 -storepass password
