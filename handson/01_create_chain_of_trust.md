@@ -175,7 +175,6 @@ echo "Generate Root CA certificate"
 echo
 
 curve="secp384r1"
-leafCurve="prime256v1"
 
 openssl ecparam -genkey -name $curve | openssl ec -aes256 -out private/ca.key.pem -passout pass:RootPassword
 chmod 400 private/ca.key.pem
@@ -440,15 +439,113 @@ Finally, concatenate both certificates into a chain
 cat intermediate/certs/int.crt.pem root/certs/ca.crt.pem > intermediate/certs/chain.crt.pem
 ```
 
-// TODO: Is this even needed?
-
-# Done
-
 You have now created a Root Authority and an Intermediate Authority, trusted (signed) by the Root.
 The Intermediate CA can now go out into the world and offer us services to verify and sign our End-Entity.
 
 # Server Certificate: The End-Entity
 
-## 1. Create a certificate for localhost
+Finally, we generate a server certificate for TLS. Switch to the directory in which the `MyCAs` directory is, and create a new `/apps` directory where we will put the server certificate.
 
-## 2. Submit the Certificate Signing Request to the Intermediate CA.
+```bash
+CURRENT_CA_PATH="$dir"
+cd ..
+appname=ubs-local
+dir="$(pwd)/apps/$appname"
+mkdir -p "$dir"
+cd "$dir"
+```
+
+## 1 Specify some certificate parameters.
+
+```bash
+cat <<- EOF >> req.cnf
+[ req ]
+distinguished_name = req_distinguished_name
+req_extensions      = extensions
+
+[ req_distinguished_name ]
+commonName          = Common Name
+commonName_default  = $appname
+countryName         = Country Name (2 letter code)
+countryName_default = CH
+countryName_min     = 2
+countryName_max     = 2
+stateOrProvinceName         = State or Province
+stateOrProvinceName_default = Switzerland
+localityName                  = Locality Name (eg, city)
+localityName_default          = Zurich
+organizationName         = Organization Name
+organizationName_default = UBS Mocked AG
+organizationalUnitName          = Organizational Unit Name (eg, section)
+organizationalUnitName_default  = handson_deepdive
+
+[ extensions ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.0 = $appname
+DNS.1 = "$appname.ch"
+DNS.2 = "www.$appname.ch"
+DNS.3 = "app.$appname.ch"
+#DNS.4 = Whatever else here
+EOF
+```
+
+- commonName: The Common Name (CN) of the certificate, typically the domain name or hostname. It defaults to $appname, set earlier as 'ubs-local'.
+- The certificate is extended with Subject Alternative Names (SAN). `[ alt_names ]` shows how multiple domain names can be added to one certificate. However, services like Let's Encrypt mostly limits alternatives to one domain name, like we do here.
+
+## 2. Generate a certificate signing request
+
+Let's generate a key pair:
+
+```bash
+openssl ecparam -name prime256v1 -genkey -noout -out $appname.key.pem
+```
+and create a CSR. It will ask you to specify some fields. Just press enter to use the defaults specified before in the req.cnf file.
+
+```bash
+openssl req -new \
+  -key $appname.key.pem \
+  -out $appname.csr.pem \
+  -config req.cnf
+```
+
+## 3. Submit the Certificate Signing Request to the Intermediate CA.
+We sign the server certificate request using the intermediate CA, using its private key. The openssl_intermediate.cnf config file specifies the path to the private key. But we still need to provide the passwort to the encrypted private key.
+
+Make sure that the file paths work out...
+```bash
+openssl ca -batch \
+  -config $CURRENT_CA_PATH/intermediate/openssl_intermediate.cnf \
+  -extensions server_cert \
+  -days 730 \
+  -notext \
+  -md sha384 \
+  -in $appname.csr.pem \
+  -out $appname.crt.pem \
+  -passin pass:IntermediatePassword
+```
+
+- The Certificate expires after 2 year. Down here in the chain of trust, things are more dynamic and less trustworthy, so you might want to renew certificates more frequently.
+
+We can now build a full chain of trust, with root, intermediate and server certificate in one file.
+```bash
+cat "$appname.crt.pem" "$CURRENT_CA_PATH/intermediate/certs/chain.crt.pem" > "$appname.chain.crt.pem"
+```
+
+## 4. Chain of Trust for Java Apps
+Java-based servers (like Tomcat) use Java Keystores (PKCS#12) to manage TLS/SSL certificates.
+The .p12 file contains both the private key and the certificate chain, making it easy to import into Java environments. 
+
+So lets repackage our server certificate, and password protect it with `password123`:
+```bash
+openssl pkcs12 -export \
+  -inkey "$appname.key.pem" \
+  -in "$appname.chain.crt.pem" \
+  -out "$appname-keystore.p12" \
+  -passout pass:password123
+```
+Inspect the content of the .p12 keystore. Can you see the 3 certificates?
+```bash
+keytool -list -v -keystore "$appname-keystore.p12" -storetype PKCS12 -storepass password123
+```
