@@ -549,3 +549,10 @@ Inspect the content of the .p12 keystore. Can you see the 3 certificates?
 ```bash
 keytool -list -v -keystore "$appname-keystore.p12" -storetype PKCS12 -storepass password123
 ```
+
+
+
+// TODO:
+```bash
+
+```
