@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.security.KeyStore;
 
-@Component
+//@Component
 public class SimpleSSLServer {
     private static final int PORT = 8443;
     private static final String KEYSTORE_PATH = "src/main/resources/keystore.jks";
