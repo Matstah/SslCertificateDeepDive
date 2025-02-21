@@ -661,3 +661,21 @@ Inspect the content of the .p12 keystore. Can you see the 3 certificates?
 ```bash
 keytool -list -v -keystore "$appname-keystore.p12" -storetype PKCS12 -storepass password123
 ```
+
+Additionally, create a truststore.p12 with only the root certificate inside.
+```bash
+keytool -importcert \                                                                    
+  -trustcacerts \
+  -file "$CURRENT_CA_PATH/root/certs/ca.crt.pem" \
+  -keystore truststore.p12 \
+  -storetype PKCS12 \
+  -storepass TruststorePassword \
+  -alias rootCA
+```
+- for some reason, java was not able to find the certificate in the truststore.p12 when i was using openssl. Keytool was working,
+- -nokeys, because it is a truststore, not a keystore.
+
+See if the Root certificate is in the truststore.p12
+```bash
+keytool -list -v -keystore truststore.p12 -storetype PKCS12 -storepass TruststorePassword
+```
