@@ -1,6 +1,14 @@
-# 2025-02-erfa-tls-handson
+# TLS ERFA HandsOn
 
-Chain of certificate authority HandsOn
+> This repository was created for a hands-on session for the 2025-02-28 ERFA.
+
+## TL;DR
+
+This repository is supporting material to learn more about certificates, `openssl`, and how chains
+of trust work.
+
+Before starting with the hands-on, we recommend preforming the docker build step below, as it can
+take a couple of minutes.
 
 ## Docker
 
@@ -22,7 +30,7 @@ you can edit files in the repository and have access to them inside the containe
 
 ## Building
 
-In order to build the application, spawn a shell via Docker:
+In order to build the Java application, spawn a shell via Docker:
 
 ```sh
 docker run --rm -e PS1 -v .:/app/host:rw -it shell:latest
@@ -35,11 +43,12 @@ cd host
 mvn clean compile
 ```
 
-## TODO
+## Material
 
-// say what this handson is about.
+This repository contains two markdown files which serve as tutorials:
 
-// explain the steps
+- [`01_create_chain_of_trust.md`](./01_create_chain_of_trust.md)
+- [`02_verify_chain_of_trust.md`](./02_verify_chain_of_trust.md)
 
-// explain where to start
-
+Simply navigate to these files and follow the tutorials. Make sure you understand why you perform
+each step. For any questions, please address the speakers.

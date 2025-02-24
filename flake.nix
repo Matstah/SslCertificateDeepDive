@@ -25,6 +25,8 @@
               openssl
               jdk21_headless
               maven
+              vim
+              nano
             ];
           };
         }
