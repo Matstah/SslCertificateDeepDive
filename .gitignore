@@ -1,6 +1,10 @@
 .DS_Store
 target/
 
+# Stuff generated during hands-on
+/MyCAs/
+/apps/
+
 # Compiled class file
 *.class
 
