@@ -59,3 +59,5 @@ This repository contains two markdown files which serve as tutorials:
 
 Simply navigate to these files and follow the tutorials. Make sure you understand why you perform
 each step. For any questions, please address the speakers.
+
+- [Slides](https://docs.google.com/presentation/d/1RZNw29-WBRYLL61j-TtX2_N1-CPbi8NyQLcdQTBxiyQ/edit?usp=sharing)
