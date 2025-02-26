@@ -9,7 +9,9 @@ probably the most known cryptographic library and is used by many applications.
 The goal is to generate a Certificate Chain of Trust.
 
 1. Create a Root Certificate Authority (Root CA) and self-sign its certificate.
-2. Create an Intermediate CA and sign its Certificate by the Root CA.
+2. Create an Intermediate CA and sign its certificate by the Root CA.
+3. Create a Server certificate signing request and use the Intermediate CA to sign it
+4. Create a Truststore and Keystore to use in a Java project.
 
 ![Chain of Trust](./assets/Certificate-Chain-of-Trust.png)
 
