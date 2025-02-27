@@ -1,4 +1,5 @@
 .DS_Store
+.idea/
 target/
 
 # Stuff generated during hands-on

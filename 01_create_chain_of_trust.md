@@ -9,7 +9,9 @@ probably the most known cryptographic library and is used by many applications.
 The goal is to generate a Certificate Chain of Trust.
 
 1. Create a Root Certificate Authority (Root CA) and self-sign its certificate.
-2. Create an Intermediate CA and sign its Certificate by the Root CA.
+2. Create an Intermediate CA and sign its certificate by the Root CA.
+3. Create a Server certificate signing request and use the Intermediate CA to sign it
+4. Create a Truststore and Keystore to use in a Java project.
 
 ![Chain of Trust](./assets/Certificate-Chain-of-Trust.png)
 
@@ -660,4 +662,25 @@ Inspect the content of the .p12 keystore. Can you see the 3 certificates?
 
 ```bash
 keytool -list -v -keystore "$appname-keystore.p12" -storetype PKCS12 -storepass password123
+```
+
+Additionally, create a `truststore.p12` with only the root certificate inside.
+
+```bash
+keytool -importcert \
+  -trustcacerts \
+  -file "$CURRENT_CA_PATH/root/certs/ca.crt.pem" \
+  -keystore truststore.p12 \
+  -storetype PKCS12 \
+  -storepass TruststorePassword \
+  -alias rootCA
+```
+
+- Java uses its own trust format, hence we need to use `keytool` to create the truststore.
+- `-nokeys`, because it is a truststore, not a keystore.
+
+See if the Root certificate is in the `truststore.p12`
+
+```bash
+keytool -list -v -keystore truststore.p12 -storetype PKCS12 -storepass TruststorePassword
 ```

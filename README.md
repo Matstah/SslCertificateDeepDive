@@ -33,7 +33,14 @@ you can edit files in the repository and have access to them inside the containe
 In order to build the Java application, spawn a shell via Docker:
 
 ```sh
-docker run --rm -e PS1 -v .:/app/host:rw -it shell:latest
+docker run --name shell -e PS1 -p 8443:8443 -v .:/app/host:rw -it shell:latest
+```
+
+If the Docker container already exists (see `docker ps -a`), you can start and attach it:
+
+```bash
+docker start shell
+docker attach shell
 ```
 
 Then go to the shared directory and compile the project:
@@ -52,3 +59,5 @@ This repository contains two markdown files which serve as tutorials:
 
 Simply navigate to these files and follow the tutorials. Make sure you understand why you perform
 each step. For any questions, please address the speakers.
+
+- [Slides](https://docs.google.com/presentation/d/1RZNw29-WBRYLL61j-TtX2_N1-CPbi8NyQLcdQTBxiyQ/edit?usp=sharing)
